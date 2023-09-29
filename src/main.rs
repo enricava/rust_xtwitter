@@ -1,5 +1,6 @@
 pub use self::error::{Error, Result};
 
+use crate::model::ModelController;
 use std::net::SocketAddr;
 use axum::{Router, response::{Html, IntoResponse, Response}, routing::{get, get_service}, extract::{Query, Path}, middleware};
 use serde::Deserialize;
@@ -11,11 +12,15 @@ mod web;
 mod model;
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<()> {
+    // Initialize ModelController
+    let mc = ModelController::new().await?;
+
     // Layers run bottom to top
     let routes_all = Router::new()
         .merge(routes_hello())
         .merge(web::routes_login::routes())
+        .nest("/api", web::routes_tweets::routes(mc.clone()))
         .layer(middleware::map_response(main_response_mapper))
         .layer(CookieManagerLayer::new())
         .fallback_service(routes_static());
@@ -28,6 +33,8 @@ async fn main() {
         .await
         .unwrap();
     // endregion:   --- Start Server
+
+    Ok(())
 }
 
 async fn main_response_mapper(res: Response) -> Response{

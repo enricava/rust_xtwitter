@@ -14,8 +14,22 @@ async fn main() -> Result<()> {
             "pwd": "demopwd" 
         })
     );
-
     req_login.await?.print().await?;
+
+    let req_create_tweet = hc.do_post(
+        "/api/tweets",
+        json!({
+            "content": "Today is a great day"
+        })
+    );
+    req_create_tweet.await?.print().await?;
+
+    hc.do_get("/api/tweets").await?.print().await?;
+
+    hc.do_delete("/api/tweets/1").await?.print().await?;
+    hc.do_delete("/api/tweets/0").await?.print().await?;
+
+    hc.do_get("/api/tweets").await?.print().await?;
 
     Ok(())
 }

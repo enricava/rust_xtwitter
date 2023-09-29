@@ -1,17 +1,22 @@
 pub use self::error::{Error, Result};
 
 use std::net::SocketAddr;
-use axum::{Router, response::{Html, IntoResponse}, routing::{get, get_service}, extract::{Query, Path}};
+use axum::{Router, response::{Html, IntoResponse, Response}, routing::{get, get_service}, extract::{Query, Path}, middleware};
 use serde::Deserialize;
 use tower_http::services::ServeDir;
+use tower_cookies::CookieManagerLayer;
 
 mod error;
 mod web;
 
 #[tokio::main]
 async fn main() {
+    // Layers run bottom to top
     let routes_all = Router::new()
         .merge(routes_hello())
+        .merge(web::routes_login::routes())
+        .layer(middleware::map_response(main_response_mapper))
+        .layer(CookieManagerLayer::new())
         .fallback_service(routes_static());
 
     // region:      --- Start Server
@@ -22,6 +27,11 @@ async fn main() {
         .await
         .unwrap();
     // endregion:   --- Start Server
+}
+
+async fn main_response_mapper(res: Response) -> Response{
+    println!("->> {:<12} - main_response_mapper {}", "RES_MAPPER", "\n");
+    res
 }
 
 fn routes_static() -> Router {

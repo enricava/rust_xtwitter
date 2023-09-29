@@ -8,6 +8,7 @@ use tower_cookies::CookieManagerLayer;
 
 mod error;
 mod web;
+mod model;
 
 #[tokio::main]
 async fn main() {

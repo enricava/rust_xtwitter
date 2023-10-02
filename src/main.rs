@@ -7,6 +7,7 @@ use serde::Deserialize;
 use tower_http::services::ServeDir;
 use tower_cookies::CookieManagerLayer;
 
+mod ctx;
 mod error;
 mod web;
 mod model;
@@ -15,13 +16,20 @@ mod model;
 async fn main() -> Result<()> {
     // Initialize ModelController
     let mc = ModelController::new().await?;
+    
+    let routes_apis = web::routes_tweets::routes(mc.clone())
+        .route_layer(middleware::from_fn(web::mw_auth::mw_require_auth));
 
     // Layers run bottom to top
     let routes_all = Router::new()
         .merge(routes_hello())
         .merge(web::routes_login::routes())
-        .nest("/api", web::routes_tweets::routes(mc.clone()))
+        .nest("/api", routes_apis)
         .layer(middleware::map_response(main_response_mapper))
+        .layer(middleware::from_fn_with_state(
+            mc.clone(),
+            web::mw_auth::mw_ctx_resolver
+        ))
         .layer(CookieManagerLayer::new())
         .fallback_service(routes_static());
 

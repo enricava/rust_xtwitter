@@ -1,6 +1,7 @@
 use axum::routing::{post, delete};
 use axum::{Json, Router};
 use axum::extract::{State, Path};
+use crate::ctx::Ctx;
 use crate::model::{ModelController, Tweet, TweetForCreate};
 use crate::Result;
 
@@ -14,32 +15,35 @@ pub fn routes(mc: ModelController) -> Router {
 // region:          --- REST Handlers
 async fn create_tweet (
     State(mc): State<ModelController>,
+    ctx: Ctx,
     Json(tweet_fc): Json<TweetForCreate>,
 ) -> Result<Json<Tweet>> {
     println!("->> {:<12} - create_ticket", "HANDLER");
 
-    let tweet = mc.create_tweet(tweet_fc).await?;
+    let tweet = mc.create_tweet(ctx, tweet_fc).await?;
 
     Ok(Json(tweet))
 }
 
 async fn list_tweets(
     State(mc): State<ModelController>,
+    ctx: Ctx,
 ) -> Result<Json<Vec<Tweet>>> {
     println!("->> {:<12} - list_tickets", "HANDLER");
 
-    let tweets = mc.list_tickets().await?;
+    let tweets = mc.list_tickets(ctx).await?;
 
     Ok(Json(tweets))
 }
 
 async fn delete_ticket(
     State(mc): State<ModelController>,
+    ctx: Ctx,
     Path(id): Path<u64>,
 ) -> Result<Json<Tweet>> {
     println!("->> {:<12} - delete_ticket", "HANDLER");
 
-    let tweet = mc.delete_ticket(id).await?;
+    let tweet = mc.delete_ticket(ctx, id).await?;
 
     Ok(Json(tweet))
 }

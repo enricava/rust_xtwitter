@@ -60,6 +60,6 @@ impl ModelController {
 
         let tweet = store.get_mut(id as usize).and_then(|t| t.take());
 
-        tweet.ok_or(Error::TweetDeleteFailIdNotFound { id: id })
+        tweet.ok_or(Error::TweetDeleteFailIdNotFound { id })
     }
 }

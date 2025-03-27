@@ -1,25 +1,20 @@
 // Simplistic Model Layer with mock-store
 
-use crate::{Error, Result, ctx::Ctx};
+use crate::{ctx::Ctx, Error, Result};
 use serde::{Deserialize, Serialize};
 use std::sync::{Arc, Mutex};
 
-// region:          --- Tweet Types
 #[derive(Clone, Debug, Serialize)]
 pub struct Tweet {
     pub id: u64,
-    pub cid: u64,   // creator uid
+    pub cid: u64, // creator uid
     pub content: String,
-
 }
 
 #[derive(Deserialize)]
 pub struct TweetForCreate {
     pub content: String,
 }
-// endregion:       --- Tweet Types
-
-// region:          --- Model Controller
 
 //Clone does not clone the vector, only the arc
 #[derive(Clone)]
@@ -38,11 +33,7 @@ impl ModelController {
 
 // CRUD Implementation
 impl ModelController {
-    pub async fn create_tweet(
-        &self,
-        ctx: Ctx,
-        tweet_fc: TweetForCreate
-    ) -> Result<Tweet> {
+    pub async fn create_tweet(&self, ctx: Ctx, tweet_fc: TweetForCreate) -> Result<Tweet> {
         let mut store = self.tweets_store.lock().unwrap();
 
         let id = store.len() as u64;
@@ -72,4 +63,3 @@ impl ModelController {
         tweet.ok_or(Error::TweetDeleteFailIdNotFound { id: id })
     }
 }
-// endregion:       --- Model Controller

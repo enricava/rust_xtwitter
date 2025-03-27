@@ -1,4 +1,4 @@
-use axum::{response::IntoResponse, http::StatusCode};
+use axum::{http::StatusCode, response::IntoResponse};
 use serde::Serialize;
 
 pub type Result<T> = core::result::Result<T, Error>;
@@ -40,9 +40,7 @@ impl Error {
             // -- Auth
             Self::AuthFailNoAuthTokenCookie
             | Self::AuthFailTokenWrongFormat
-            | Self::AuthFailCtxNotInRequestExt => {
-                (StatusCode::FORBIDDEN, ClientError::NO_AUTH)
-            }
+            | Self::AuthFailCtxNotInRequestExt => (StatusCode::FORBIDDEN, ClientError::NO_AUTH),
 
             // -- Model
             Self::TweetDeleteFailIdNotFound { .. } => {
@@ -52,11 +50,10 @@ impl Error {
             _ => (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 ClientError::SERVICE_ERROR,
-            )
+            ),
         }
     }
 }
-
 
 #[derive(Debug, strum_macros::AsRefStr)] // allow to serialize enum as str
 #[allow(non_camel_case_types)]

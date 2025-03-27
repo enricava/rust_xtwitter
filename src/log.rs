@@ -1,14 +1,13 @@
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use crate::ctx::Ctx;
 use crate::error::ClientError;
 use crate::{Error, Result};
-use crate::ctx::Ctx;
 use axum::http::{Method, Uri};
 use serde::Serialize;
 use serde_json::{json, Value};
 use serde_with::skip_serializing_none;
 use uuid::Uuid;
-
 
 pub async fn log_request(
     uuid: Uuid,
@@ -49,11 +48,11 @@ pub async fn log_request(
     Ok(())
 }
 
-#[skip_serializing_none]    // remove noise
+#[skip_serializing_none] // remove noise
 #[derive(Serialize)]
 struct RequestLogLine {
-    uuid: String,           // uuid string formatted
-    timestamp: String,      // should be iso8601
+    uuid: String,      // uuid string formatted
+    timestamp: String, // should be iso8601
 
     // -- User and context attributes.
     user_id: Option<u64>,

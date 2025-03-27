@@ -11,8 +11,8 @@ async fn main() -> Result<()> {
         "/api/login",
         json!({
             "username": "demo",
-            "pwd": "demopwd" 
-        })
+            "pwd": "demopwd"
+        }),
     );
     req_login.await?.print().await?;
 
@@ -20,7 +20,7 @@ async fn main() -> Result<()> {
         "/api/tweets",
         json!({
             "content": "Today is a great day"
-        })
+        }),
     );
     req_create_tweet.await?.print().await?;
 
